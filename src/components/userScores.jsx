@@ -1,18 +1,19 @@
 import axios from "axios";
 import '../styles/userScores.css'
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function(){
+    const navigate = useNavigate()
     const {userId} = useParams('userId')
     const [highRiser, setHighRiser] = useState('')
     const [consistencyScore, setConsistencyScore] = useState('')
-    const [am_or_pm, setAMPM] = useState('')
+    const [am_or_pm, setAMPM] = useState('AM Or PM')
     const [amPMScore, setAMPMScore] = useState('')
-    const [earlyOrlatePusher, setPusher] = useState('')
+    const [earlyOrlatePusher, setPusher] = useState('Pusher')
     const [earlyOrlatePusherScore, setPusherScore] = useState('')
     const [pacerScore, setPacerScore] = useState('')
-    const [showSwitch, setShowSwitch]= useState('')
+    const [showSwitch, setShowSwitch]= useState('Leaderboard Unavailable')
     const [momentumScore, setMomentum] = useState('')
     const [time2k, set2k] = useState('')
     const [time5k, set5k] = useState('')
@@ -27,7 +28,13 @@ export default function(){
                 Authorization: localStorage.getItem('token')
             }
         }).then((response) =>{
-            setHighRiser(response.data.elevationScore)
+            if(response.data.success == false){
+                return
+            }
+            if(response.data.elevationScore != "NaN"){
+                setHighRiser(response.data.elevationScore)
+            }
+            
             setConsistencyScore(response.data.consistencyScore)
             if(response.data.AM_PM_score.time == "PM"){
                 setAMPM("Night Owl")
@@ -38,18 +45,30 @@ export default function(){
             else{
                 setAMPM("Equal Time Runner")
             }
-            setAMPMScore(response.data.AM_PM_score.score)    
-            setPusher(response.data.timePusher.time)    
+            setAMPMScore(response.data.AM_PM_score.score)  
+
+            setPusher(response.data.timePusher.time)   
+
             setPusherScore(response.data.timePusher.value)   
-            setPacerScore(response.data.pacerScore) 
+
+            if(response.data.pacerScore != "NaN"){
+                setPacerScore(response.data.pacerScore) 
+            }
             setShowSwitch(response.data.leaderMSG)
-            setMomentum(response.data.momentumScore)
+            if(response.data.momentumScore != "NaN"){
+                setMomentum(response.data.momentumScore)
+            }
+
             set2k(response.data.regularScores.time2k)
             set5k(response.data.regularScores.time5k)
             set10k(response.data.regularScores.time10k)
             set20k(response.data.regularScores.time20k)
-            setImprover(response.data.improvement)
-            setCalories(response.data.calories)
+            if(response.data.improvement != null){
+                setImprover(response.data.improvement)
+            }
+            if(response.data.calories != "NaN"){
+                setCalories(response.data.calories)
+            }
         })
     }, [])
 
@@ -85,93 +104,105 @@ export default function(){
         }
     }
 
+    function sendToPage(event){
+        const name = event.currentTarget.querySelector('h2').textContent;
+        const value = event.currentTarget.querySelector('h4').textContent;
+        navigate("/userdash/scorePage", {
+            state:{
+                name: name,
+                value, value
+            }
+        })
+        
+    }
+
     return(
         <div className="allScoreBody">
             <div className="allScoreContainer">
             <h1 id="TitlesInScores">Regular Scores</h1>
 
             <div className="horizontalScores">    
-                    <div className="EachScore">
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>2k</h2>
                         <h4>{time2k}</h4>
                         <p>Your average pace for your recent 2km runs</p>
-                    </div>
-                    <div className="EachScore">
+                    </button>
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>5k</h2>
                         <h4>{time5k}</h4>
                         <p>Your average pace for your recent 5km runs</p>
-                    </div>
+                    </button>
                 </div>
                 <div className="horizontalScores">
-                    <div className="EachScore">
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>10k</h2>
                         <h4>{time10k}</h4>
                         <p>Your average pace for your recent 10km runs</p>
-                    </div>
-                    <div className="EachScore">
+                    </button>
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>20k</h2>
                         <h4>{time20k}</h4>
                         <p>Your average pace for your recent 20km runs</p>
-                    </div>
+                    </button>
                 </div>
 
                 <h1 id="TitlesInScores">TMRUN Scores</h1>
 
                 <div className="horizontalScores">    
-                    <div className="EachScore">
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>High Riser</h2>
                         <h4>{highRiser}</h4>
                         <p>The high riser score is based on how much elevation you gain per run</p>
-                    </div>
-                    <div className="EachScore">
+                    </button>
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>Captain Consistent</h2>
                         <h4>{consistencyScore}</h4>
                         <p>The consistency score is based on how many times you've run in the last month.
                              It is scored from 0-100.
                         </p>
-                    </div>
+                    </button>
                 </div>
                 <div className="horizontalScores">
-                    <div className="EachScore">
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>Pacer</h2>
                         <h4>{pacerScore}</h4>
                         <p>Your pacer score is made from looking at your fastest and slowest km 
                             from your most recent runs. A good pacer score means that you have a 
                             small range between your slowest and fastest kms.</p>
-                    </div>
-                    <div className="EachScore">
+                    </button>
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>Momentum</h2>
                         <h4>{momentumScore}</h4>
                         <p>Your momentum score is based on your maximum momentum from your past runs. 
                             Higher the score, the more unstoppable you are. A real force to recon with</p>
-                    </div>
+                    </button>
                 </div>
 
                 <h1 id="TitlesInScores">TMRUN Percentages</h1>
                 <div className="horizontalScores">
-                    <div className="EachScore">
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>{am_or_pm}</h2>
                         <h4>{amPMScore + "%"}</h4>
                         <p>Your a {am_or_pm} since you run {amPMScore}% of the time {am_or_pm == "Night Owl" ? "in the evening": "in the day" }</p>
-                    </div>
-                    <div className="EachScore">
+                    </button>
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>{earlyOrlatePusher}</h2>
                         <h4>{earlyOrlatePusherScore}%</h4>
                         <p> {pusherMessage()} </p>
-                    </div>
+                    </button>
                 </div>
 
                 <div className="horizontalScores">
-                    <div className="EachScore">
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>Improver</h2>
                         <h4>{imrover + "%"}</h4>
                         <p>When comparing your most recent run's average pace to your last month's pace, you've changed {imrover}% </p>
-                    </div>
-                    <div className="EachScore">
+                    </button>
+                    <button onClick={sendToPage} className="EachScore">
                         <h2>Meal Runner</h2>
                         <h4>{calories}%</h4>
                         <p>Judging from your most recent runs, you burn a full meal's worth of calories (500 calories), {calories}% of the time</p>
-                    </div>
+                    </button>
                 </div>
 
 
