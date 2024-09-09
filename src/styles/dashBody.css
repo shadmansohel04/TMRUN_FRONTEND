@@ -13,13 +13,14 @@
 }
 
 .leftUserDash{
+    overflow: hidden;
     width: 50%;
     height: 100%;
     display: flex;
     flex-direction: column;
     padding-right: 5%;
     align-items: center;
-    text-overflow:ellipsis;
+    overflow-wrap: anywhere;
 }
 
 .leftUserDash h1{
@@ -147,16 +148,17 @@
     }
 
     .leftUserDash{
-        width: 70%;
+        width: 90%;
         height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: left;
+        padding: 0;
     }
     
     .leftUserDash h1{
-        font-size: 14.2vw;
+        font-size: 12vw;
         margin-bottom: 14%;
     }
 
